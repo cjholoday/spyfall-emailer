@@ -51,46 +51,44 @@ def main(emails, config):
         cache_file.write(chosen_loc + '\n')
 
     
+    # Display time in a pretty way. Taken from stackoverflow
     timestamp = time.strftime('%l:%M%p %Z on %b %d, %Y')
     roles = locs[chosen_loc]
     if len(player_emails) - 1 > len(roles):
         print("Error: Not enough roles for all players", file=sys.stderr)
         sys.exit(1)
 
+    spy_email = random.choice(player_emails)
     msgs = {}
     for email in player_emails:
-        chosen_idx = random.randrange(len(roles))
-        msgs[email] = construct_msg(chosen_loc, roles[chosen_idx], locs, 
-                                    timestamp)
-        del(roles[chosen_idx])
-
-    for email, msg in msgs.items():
-        print(email)
-        print(msg)
-        print()
-
-    print(chosen_loc)
-    print(locs)
-    print(loc_cache)
-
-    # Display time in a pretty way. Taken from stackoverflow
-    print(timestamp)
-
-    return # FIXME
-    
-    # choose a random location
+        if email == spy_email:
+            msgs[email] = construct_msg('???', 'Spy!', locs, timestamp)
+        else:
+            chosen_idx = random.randrange(len(roles))
+            msgs[email] = construct_msg(chosen_loc, roles[chosen_idx], locs, 
+                                        timestamp)
+            del(roles[chosen_idx])
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(src_email, src_password)
 
-    msg = "Hello World"
     for email in player_emails:
-        server.sendmail(src_email, email, msg)
+        server.sendmail(src_email, email, msgs[email])
     server.quit()
 
 def construct_msg(loc, role, locs, timestamp):
-    return role
+    msg = 'Subject: Spyfall Game Details'
+    msg += '\n\n'
+    msg += 'Hi! Here are your game details:\n'
+    msg += '\n'
+    msg += 'Role: {}\n'.format(role)
+    msg += 'Location: {}\n'.format(loc)
+    msg += 'Timestamp:{}\n'.format(timestamp)
+    msg += '\n'
+    msg += 'All potential locations:\n'
+    msg += '\n'.join([' - ' + l for l in locs]) + '\n'
+    return msg
 
 if __name__ == "__main__":
     main()
