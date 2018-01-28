@@ -1,5 +1,6 @@
 config
 players
+loc_cache.txt
 
 # reserved for a virtual environment
 env/
