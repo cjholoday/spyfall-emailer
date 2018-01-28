@@ -27,15 +27,6 @@
         "Ice Cream Man"
     ],
     "Cathedral": [
-        "Bartender",
-        "Head of Security",
-        "Bouncer",
-        "Pit Boss",
-        "Hustler",
-        "Dealer",
-        "Gambler"
-    ],
-    "Casino": [
         "Priest",
         "Beggar",
         "Sinner",
@@ -43,6 +34,15 @@
         "Tourist",
         "Deacon",
         "Choir Singer"
+    ],
+    "Casino": [
+        "Bartender",
+        "Head of Security",
+        "Bouncer",
+        "Pit Boss",
+        "Hustler",
+        "Dealer",
+        "Gambler"
     ],
     "Circus Tent": [
         "Acrobat",
