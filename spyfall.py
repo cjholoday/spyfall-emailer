@@ -58,16 +58,24 @@ def main(emails, config):
         print("Error: Not enough roles for all players", file=sys.stderr)
         sys.exit(1)
 
-    spy_email = random.choice(player_emails)
-    msgs = {}
-    for email in player_emails:
-        if email == spy_email:
-            msgs[email] = construct_msg('???', 'Spy!', locs, timestamp)
-        else:
-            chosen_idx = random.randrange(len(roles))
-            msgs[email] = construct_msg(chosen_loc, roles[chosen_idx], locs, 
-                                        timestamp)
-            del(roles[chosen_idx])
+    with open('log.txt', 'w') as log:
+        log.write('Location: {}\n'.format(chosen_loc))
+        log.write('Timestamp: {}\n'.format(timestamp))
+        log.write('Roles:\n')
+
+        spy_email = random.choice(player_emails)
+        msgs = {}
+        for email in player_emails:
+            seen_loc = '???'
+            role = 'Spy!'
+            if email != spy_email:
+                chosen_idx = random.randrange(len(roles))
+                role = roles[chosen_idx]
+                del(roles[chosen_idx])
+                seen_loc = chosen_loc
+            msgs[email] = construct_msg(seen_loc, role, locs, timestamp)
+            log.write(' - {}: {}\n'.format(email, role))
+
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()

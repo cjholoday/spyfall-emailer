@@ -2,5 +2,8 @@ config
 players
 loc_cache.txt
 
+# contains last game's roles and location
+log.txt
+
 # reserved for a virtual environment
 env/
