@@ -1,5 +1,6 @@
 import smtplib
 import random
+import time
 import json
 
 
@@ -49,10 +50,32 @@ def main(emails, config):
             cache_file.write(loc_cache[i] + '\n')
         cache_file.write(chosen_loc + '\n')
 
+    
+    timestamp = time.strftime('%l:%M%p %Z on %b %d, %Y')
+    roles = locs[chosen_loc]
+    if len(player_emails) - 1 > len(roles):
+        print("Error: Not enough roles for all players", file=sys.stderr)
+        sys.exit(1)
+
+    msgs = {}
+    for email in player_emails:
+        chosen_idx = random.randrange(len(roles))
+        msgs[email] = construct_msg(chosen_loc, roles[chosen_idx], locs, 
+                                    timestamp)
+        del(roles[chosen_idx])
+
+    for email, msg in msgs.items():
+        print(email)
+        print(msg)
+        print()
 
     print(chosen_loc)
     print(locs)
     print(loc_cache)
+
+    # Display time in a pretty way. Taken from stackoverflow
+    print(timestamp)
+
     return # FIXME
     
     # choose a random location
@@ -65,6 +88,9 @@ def main(emails, config):
     for email in player_emails:
         server.sendmail(src_email, email, msg)
     server.quit()
+
+def construct_msg(loc, role, locs, timestamp):
+    return role
 
 if __name__ == "__main__":
     main()
