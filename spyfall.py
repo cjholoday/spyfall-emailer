@@ -25,6 +25,16 @@ def main(emails, config):
     with open(emails, 'r') as emails_file:
         player_emails = [email.rstrip() for email in emails_file.readlines()]
 
+    # randomize the player order to randomize role assignment
+    #
+    # Note that shuffling the roles list instead wouldn't
+    # fully randomize role assignment: if there are more players than roles,
+    # then some players would consistently obtain the same role across
+    # games. This is because of the periodic nature of role assignment, which
+    # is done with modulo arithmetic
+    random.shuffle(player_emails)
+
+
     with open('locs.json', 'r') as data_file:
         locs = json.loads(data_file.read())
 
@@ -54,9 +64,6 @@ def main(emails, config):
     # Display time in a pretty way. Taken from stackoverflow
     timestamp = time.strftime('%l:%M%p %Z on %b %d, %Y')
     roles = locs[chosen_loc]
-    if len(player_emails) - 1 > len(roles):
-        print("Error: Not enough roles for all players", file=sys.stderr)
-        sys.exit(1)
 
     with open('log.txt', 'w') as log:
         log.write('Location: {}\n'.format(chosen_loc))
@@ -65,13 +72,14 @@ def main(emails, config):
 
         spy_email = random.choice(player_emails)
         msgs = {}
+
+        role_idx = 0
         for email in player_emails:
             seen_loc = '???'
             role = 'Spy!'
             if email != spy_email:
-                chosen_idx = random.randrange(len(roles))
-                role = roles[chosen_idx]
-                del(roles[chosen_idx])
+                role = roles[role_idx % len(roles)]
+                role_idx += 1
                 seen_loc = chosen_loc
             msgs[email] = construct_msg(seen_loc, role, locs, timestamp)
             log.write(' - {}: {}\n'.format(email, role))
